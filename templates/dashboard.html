@@ -66,7 +66,9 @@
                       {% else %}
                       <p class="font-semibold text-ink">{{ f.name }}</p>
                       {% endif %}
-                      <p class="text-xs text-soft mt-0.5">{{ f.size or 'Taille inconnue' }}</p>
+                      {% if f.size %}
+                      <p class="text-xs text-soft mt-0.5">{{ f.size }}</p>
+                      {% endif %}
                     </div>
                   </div>
                 </td>
