@@ -1,41 +1,92 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,500;6..72,700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet"/>
     <script id="tailwind-config">
-        tailwind.config = {
-          darkMode: "class",
-          theme: {
-            extend: {
-              colors: {
-                "primary": "#2463eb",
-                "background-light": "#f6f6f8",
-                "background-dark": "#111621",
-              },
-              fontFamily: {
-                "display": ["Inter"]
-              },
-              borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              mist: '#f4fbf6',
+              ink: '#173024',
+              soft: '#5f7468',
+              line: '#d6e7dc',
+              accent: '#96dca8',
+              accentDeep: '#2f8f56',
             },
+            fontFamily: {
+              sans: ['Manrope', 'sans-serif'],
+              display: ['Newsreader', 'serif'],
+            },
+            boxShadow: {
+              soft: '0 12px 40px -24px rgba(23, 48, 36, 0.35)',
+            },
+            keyframes: {
+              fadeUp: {
+                '0%': { opacity: '0', transform: 'translateY(10px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              }
+            },
+            animation: {
+              fadeUp: 'fadeUp 0.5s ease-out both',
+            }
           },
-        }
-      </script>
+        },
+      }
+    </script>
+    <style>
+      :root {
+        --bg: #f4fbf6;
+        --panel: #ffffff;
+        --ink: #173024;
+        --soft: #5f7468;
+        --line: #d6e7dc;
+        --accent: #96dca8;
+      }
+      body {
+        background:
+          radial-gradient(950px 500px at 100% -10%, rgba(150, 220, 168, 0.30), transparent 55%),
+          radial-gradient(900px 500px at -15% 0%, rgba(150, 220, 168, 0.18), transparent 50%),
+          var(--bg);
+      }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+      }
+      .text-soft {
+        color: var(--soft);
+      }
+      .flash-item {
+        border: 1px solid var(--line);
+      }
+      .flash-success {
+        background: #edf8f0;
+        color: #215135;
+      }
+      .flash-error {
+        background: #fff5f5;
+        color: #8d2d2d;
+        border-color: #f4cccc;
+      }
+    </style>
     <title>{% block title %}FileShare{% endblock %}</title>
 </head>
-<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<body class="min-h-screen text-ink font-sans antialiased">
+{% set app_shell = request.endpoint in ['dashboard', 'upload'] %}
 
-{% include 'components/_header.html' %}
+{% if not app_shell %}
+  {% include 'components/_header.html' %}
+{% endif %}
 
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 animate-fadeUp">
       {% for category, msg in messages %}
-        <div class="mb-2 px-4 py-2 rounded {{ 'bg-red-100 text-red-800' if category=='error' else 'bg-green-100 text-green-800' }}">
+        <div class="flash-item {{ 'flash-error' if category=='error' else 'flash-success' }} mb-2 px-4 py-3 rounded-xl text-sm font-medium shadow-soft">
           {{ msg }}
         </div>
       {% endfor %}
@@ -43,11 +94,13 @@
   {% endif %}
 {% endwith %}
 
-<div id="content">
-    {% block content %}{% endblock %}
+<div id="content" class="relative">
+  {% block content %}{% endblock %}
 </div>
 
-{% include 'components/_footer.html' %}
+{% if not app_shell %}
+  {% include 'components/_footer.html' %}
+{% endif %}
 
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 {% block scripts %}{% endblock %}

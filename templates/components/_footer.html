@@ -1,50 +1,26 @@
-<footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-12">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div class="col-span-1 md:col-span-2">
-                <div class="flex items-center gap-2 mb-4">
-                    <div class="bg-primary p-1.5 rounded">
-                        <span class="material-icons text-white text-sm">cloud_upload</span>
-                    </div>
-                    <span class="text-lg font-bold text-slate-900 dark:text-white">FileShare</span>
-                </div>
-                <p class="text-slate-500 dark:text-slate-400 max-w-sm mb-6">
-                    Secure, fast, and simple file sharing for everyone. Join our community of millions sharing files globally every day.
-                </p>
-                <div class="flex gap-4">
-                    <a class="text-slate-400 hover:text-primary transition-colors" href="#"><span class="material-icons">facebook</span></a>
-                    <a class="text-slate-400 hover:text-primary transition-colors" href="#"><span class="material-icons">language</span></a>
-                    <a class="text-slate-400 hover:text-primary transition-colors" href="#"><span class="material-icons">terminal</span></a>
-                </div>
-            </div>
-            <div>
-                <h4 class="font-bold text-slate-900 dark:text-white mb-4">Product</h4>
-                <ul class="space-y-2 text-slate-500 dark:text-slate-400 text-sm">
-                    <li><a class="hover:text-primary transition-colors" href="#">Features</a></li>
-                    <li><a class="hover:text-primary transition-colors" href="#">Security</a></li>
-                    {% if request.endpoint == 'home' %}
-                    <li><a class="hover:text-primary transition-colors" href="#">Fichiers publics</a></li>
-                    {% endif %}
-                    <li><a class="hover:text-primary transition-colors" href="#">Pricing</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4 class="font-bold text-slate-900 dark:text-white mb-4">Legal</h4>
-                <ul class="space-y-2 text-slate-500 dark:text-slate-400 text-sm">
-                    <li><a class="hover:text-primary transition-colors" href="#">Privacy Policy</a></li>
-                    <li><a class="hover:text-primary transition-colors" href="#">Terms of Service</a></li>
-                    <li><a class="hover:text-primary transition-colors" href="#">Cookie Policy</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="mt-12 pt-8 border-t border-slate-100 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p class="text-slate-400 text-sm">© 2024 FileShare Inc. All rights reserved.</p>
-            <div class="flex items-center gap-6">
-                <span class="flex items-center gap-1 text-slate-400 text-sm">
-                    <span class="material-icons text-sm text-green-500">circle</span>
-                    System Status: Operational
-                </span>
-            </div>
-        </div>
+<footer class="mt-16 border-t border-line/80 bg-white/70 backdrop-blur">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <p class="font-display text-2xl text-ink">FileShare</p>
+        <p class="text-sm text-soft mt-1">Partage de fichiers simple, propre et securise.</p>
+      </div>
+      <div class="flex items-center gap-4 text-sm text-soft">
+        <a href="{{ url_for('home') }}" class="hover:text-ink transition-colors">Public</a>
+        {% if session.user %}
+          <a href="{{ url_for('dashboard') }}" class="hover:text-ink transition-colors">Dashboard</a>
+          <a href="{{ url_for('upload') }}" class="hover:text-ink transition-colors">Upload</a>
+        {% else %}
+          <a href="{{ url_for('login') }}" class="hover:text-ink transition-colors">Connexion</a>
+        {% endif %}
+      </div>
     </div>
+    <div class="mt-8 pt-6 border-t border-line/70 text-xs text-soft flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+      <span>© 2026 FileShare</span>
+      <span class="inline-flex items-center gap-2">
+        <span class="h-2 w-2 rounded-full bg-accentDeep"></span>
+        Systeme operationnel
+      </span>
+    </div>
+  </div>
 </footer>

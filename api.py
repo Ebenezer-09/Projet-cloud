@@ -1,7 +1,10 @@
 import os
+import logging
 import requests
 
 BASE_URL = os.getenv('CLOUD_API_URL', 'https://cloud-backend-80wx.onrender.com')
+TIMEOUT_SECONDS = int(os.getenv('API_TIMEOUT_SECONDS', '15'))
+logger = logging.getLogger(__name__)
 
 # use a single Session object to preserve cookies between calls
 _session = requests.Session()
@@ -14,16 +17,14 @@ class APIError(Exception):
 
 def _request(method, path, token=None, **kwargs):
     url = BASE_URL.rstrip('/') + path
-    # log outgoing request for debugging
-    app_logger = None
-    try:
-        # import inside to avoid circular import at module load
-        from app import app as _app
-        app_logger = _app.logger
-    except Exception:
-        pass
-    if app_logger:
-        app_logger.debug(f"API request -> {method} {url} headers={kwargs.get('headers')} params={kwargs.get('params')} json={kwargs.get('json')}")
+    logger.debug(
+        "API request -> %s %s headers=%s params=%s json=%s",
+        method,
+        url,
+        kwargs.get('headers'),
+        kwargs.get('params'),
+        kwargs.get('json'),
+    )
     headers = kwargs.pop('headers', {}) or {}
     headers.setdefault('Accept', 'application/json')
     if token:
@@ -33,7 +34,7 @@ def _request(method, path, token=None, **kwargs):
         headers.setdefault('Content-Type', 'application/json')
     # use persistent session so cookies (e.g. from login) are preserved
     try:
-        response = _session.request(method, url, headers=headers, **kwargs)
+        response = _session.request(method, url, headers=headers, timeout=TIMEOUT_SECONDS, **kwargs)
     except requests.exceptions.RequestException as exc:
         # network-level error
         raise APIError(str(exc))

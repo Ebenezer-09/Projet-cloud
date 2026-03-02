@@ -1,78 +1,63 @@
 {% extends 'base.html' %}
 {% block title %}FileShare - Fichiers publics{% endblock %}
 {% block content %}
-<!-- Hero Section -->
-<section class="relative py-16 sm:py-24 overflow-hidden">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div class="text-center max-w-3xl mx-auto">
-            <h1 class="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-6xl mb-6">
-                Fichiers publics
-            </h1>
-            <p class="text-lg text-slate-600 dark:text-slate-400 mb-10">
-                Accédez et téléchargez les ressources partagées par notre communauté. Parcourez des milliers de documents publics vérifiés.
-            </p>
-            <!-- Search Bar -->
-            <div class="relative max-w-2xl mx-auto">
-                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <span class="material-icons text-slate-400">search</span>
-                </div>
-                <input id="search-input" class="block w-full pl-12 pr-4 py-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl focus:ring-2 focus:ring-primary focus:border-transparent transition-all dark:text-white placeholder-slate-400" placeholder="Rechercher par nom, extension ou tags..." type="text"/>
-            </div>
+<main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
+  <section class="animate-fadeUp">
+    <div class="panel rounded-3xl p-6 sm:p-10 shadow-soft relative overflow-hidden">
+      <div class="absolute -right-24 -top-24 h-56 w-56 rounded-full bg-accent/25 blur-2xl"></div>
+      <div class="absolute -left-28 -bottom-28 h-64 w-64 rounded-full bg-accent/15 blur-2xl"></div>
+
+      <div class="relative">
+        <p class="text-xs uppercase tracking-[0.2em] text-soft">Bibliotheque publique</p>
+        <h1 class="mt-3 font-display text-4xl sm:text-5xl leading-tight text-ink">Fichiers accessibles a tous</h1>
+        <p class="mt-4 text-soft max-w-2xl">Une interface simple pour parcourir les documents partages, avec une recherche rapide et une lecture claire.</p>
+
+        <div class="mt-8 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+          <div class="relative w-full sm:max-w-lg">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-soft text-[20px]">search</span>
+            <input id="search-input" type="text" placeholder="Rechercher un fichier..." class="w-full rounded-xl border border-line bg-white pl-10 pr-4 py-3 text-sm focus:border-accentDeep focus:ring-accentDeep"/>
+          </div>
+          <p id="home-count" class="text-sm text-soft">{{ public_files|length }} fichier(s)</p>
         </div>
+      </div>
     </div>
-    <!-- Decorative Background Element -->
-    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full opacity-10 pointer-events-none">
-        <div class="absolute top-0 left-1/4 w-72 h-72 bg-primary rounded-full blur-3xl"></div>
-        <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-primary/40 rounded-full blur-3xl"></div>
-    </div>
-</section>
-<!-- Main Content Grid -->
-<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
-    <div class="flex items-center justify-between mb-8">
-        <h2 class="text-xl font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2">
-            <span class="material-icons text-primary">folder_open</span>
-            Récemment ajoutés
-        </h2>
-        <div class="flex gap-2">
-            <button class="p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors text-slate-500">
-                <span class="material-icons">grid_view</span>
-            </button>
-            <button class="p-2 rounded hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors text-slate-500">
-                <span class="material-icons">list</span>
-            </button>
+  </section>
+
+  <section class="mt-8">
+    <div id="public-files-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+      {% for f in public_files %}
+      <article data-public-file data-name="{{ (f.name or '')|lower }}" data-description="{{ (f.description or '')|lower }}" class="panel rounded-2xl p-5 shadow-soft animate-fadeUp">
+        <div class="flex items-start justify-between gap-3">
+          <div class="h-11 w-11 rounded-xl bg-mist border border-line flex items-center justify-center text-ink">
+            <span class="material-symbols-outlined text-[22px]">insert_drive_file</span>
+          </div>
+          {% if f.status %}
+          <span class="rounded-full bg-mist text-ink text-xs font-semibold px-3 py-1 border border-line">{{ f.status }}</span>
+          {% endif %}
         </div>
-    </div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {% for f in public_files %}
-        <div class="group bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 p-5 rounded-xl hover:shadow-lg transition-all border-b-4 border-b-transparent hover:border-b-primary">
-            <div class="flex items-start justify-between mb-4">
-                <div class="p-3 {{ icon_bg_color(f.status) if f.status else 'bg-slate-50' }} rounded-lg text-{{ icon_color(f.status) if f.status else 'slate-600' }}">
-                    <span class="material-icons text-3xl">{{ f.icon or 'insert_drive_file' }}</span>
-                </div>
-                <span class="text-xs font-medium px-2 py-1 bg-slate-100 dark:bg-slate-700 rounded text-slate-500 dark:text-slate-400">{{ f.size or '' }}</span>
-            </div>
-            <h3 class="font-bold text-slate-900 dark:text-white mb-2 truncate">{{ f.name }}</h3>
-            <p class="text-sm text-slate-600 dark:text-slate-400 mb-6 line-clamp-2">{{ f.description or '' }}</p>
-            <a href="{{ f.link or f.url }}" class="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-primary/10 hover:bg-primary text-primary hover:text-white font-semibold rounded-lg transition-all" target="_blank" rel="noopener">
-                <span class="material-icons text-sm">download</span>
-                Télécharger
-            </a>
+
+        <h2 class="mt-4 text-lg font-bold text-ink break-words">{{ f.name }}</h2>
+        <p class="mt-2 text-sm text-soft min-h-[2.8rem]">{{ f.description or 'Aucune description.' }}</p>
+
+        <div class="mt-5 flex items-center justify-between gap-3">
+          <span class="text-xs text-soft">{{ f.size or 'Taille inconnue' }}</span>
+          {% if f.link or f.url %}
+          <a href="{{ f.link or f.url }}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 rounded-lg bg-accent px-3.5 py-2 text-sm font-semibold text-ink hover:bg-accent/80 transition-colors">
+            <span class="material-symbols-outlined text-[18px]">download</span>
+            Ouvrir
+          </a>
+          {% else %}
+          <span class="text-xs text-soft">Lien indisponible</span>
+          {% endif %}
         </div>
-        {% else %}
-        <p>Aucun fichier public disponible.</p>
-        {% endfor %}
+      </article>
+      {% else %}
+      <div class="panel rounded-2xl p-8 text-center text-soft col-span-full">Aucun fichier public disponible pour le moment.</div>
+      {% endfor %}
     </div>
-    <!-- Pagination Placeholder -->
-    <div class="mt-16 flex items-center justify-center gap-2">
-        <button class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-primary transition-colors">
-            <span class="material-icons">chevron_left</span>
-        </button>
-        <button class="w-10 h-10 flex items-center justify-center rounded-lg bg-primary text-white font-bold">1</button>
-        <button class="w-10 h-10 flex items-center justify-center rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">2</button>
-        <button class="w-10 h-10 flex items-center justify-center rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">3</button>
-        <button class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-primary transition-colors">
-            <span class="material-icons">chevron_right</span>
-        </button>
-    </div>
-</section>
+    {% if public_files %}
+    <div id="public-empty" class="hidden panel rounded-2xl p-8 text-center text-soft mt-4">Aucun resultat pour cette recherche.</div>
+    {% endif %}
+  </section>
+</main>
 {% endblock %}

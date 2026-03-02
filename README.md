@@ -1,53 +1,54 @@
-# Objectif du projet
+# Frontend Flask - Cloud Files
 
-Une interface Flask/TailwindCSS servant de frontend à une API de partage de fichiers. Le but est de fournir un panneau utilisateur léger permettant de s'authentifier, téléverser, lister, modifier le statut et supprimer des documents, ainsi qu'une page publique présentant les fichiers partagés.
+Interface Flask/Tailwind qui consomme une API de partage de fichiers.
 
-## Fonctionnalités développées
+## Fonctionnalites
 
-* Authentification (connexion / inscription / déconnexion)
-* Téléversement de fichiers via formulaire multipart avec statut public/privé
-* Affichage de la liste des fichiers privés pour l'utilisateur
-* Actions sur chaque fichier : changer le statut, supprimer
-* Page d'accueil listant les fichiers publics
-* Sidebar et footer réutilisables
-* Validation client et logs d'upload
-* Limite de taille 10Mo sur le formulaire
+- Authentification (login/signup/logout)
+- Upload de fichier (public/prive)
+- Tableau de bord utilisateur (liste, changement de statut, suppression)
+- Page publique des fichiers partages
 
-## Structure du projet
+## Demarrage local
 
-`
-frontend/
-├── app.py                 # serveur Flask principal
-├── api.py                 # wrapper HTTP vers l'API backend
-├── templates/             # templates Jinja2
-│   ├── base.html          # layout principal
-│   ├── home.html          # page publique
-│   ├── login.html
-│   ├── signup.html
-│   ├── dashboard.html     # tableau de bord utilisateur
-│   ├── upload.html        # formulaire d'upload
-│   └── components/        # fragments (header, footer, sidebar)
-└── static/
-    └── js/
-        └── main.js       # scripts client (auto-fill, debug)
-`
+1. Creer un environnement virtuel:
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
 
-## Comment lancer le projet
+2. Installer les dependances:
+```bash
+pip install -r requirements.txt
+```
 
-1. **Préparer l'environnement** : Python?3.9+ et un virtuel (python -m venv .venv).
-2. **Activer le virtuel** (PowerShell : & .\\.venv\\Scripts\\Activate.ps1).
-3. **Installer les dépendances** :
-   `
-   pip install -r requirements.txt
-   `
-4. **Définir les variables** : CLOUD_API_URL (optionnel) et FLASK_SECRET_KEY.
-5. **Démarrer le serveur** :
-   `
-   set FLASK_APP=app.py  # Windows
-   flask run
-   # ou
-   py app.py
-   `
-6. **Ouvrir un navigateur** à http://127.0.0.1:5000.
+3. Variables d'environnement:
+```bash
+export FLASK_SECRET_KEY="une-cle-secrete-forte"
+export CLOUD_API_URL="https://cloud-backend-80wx.onrender.com"
+```
 
+4. Lancer l'application:
+```bash
+python3 app.py
+```
+
+## Deploiement Vercel
+
+Le projet est pret pour Vercel avec `vercel.json`.
+
+1. Importer le repo dans Vercel.
+2. Ajouter les variables d'environnement dans le projet Vercel:
+   - `FLASK_SECRET_KEY` (obligatoire en production)
+   - `CLOUD_API_URL` (URL de ton backend)
+   - `API_TIMEOUT_SECONDS` (optionnel, ex: `15`)
+3. Lancer le deploy.
+
+## Structure utile
+
+- `app.py`: application Flask principale
+- `api.py`: client HTTP vers le backend
+- `templates/`: vues Jinja2
+- `static/`: assets frontend
+- `vercel.json`: configuration de deploiement Vercel
 

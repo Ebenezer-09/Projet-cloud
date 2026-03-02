@@ -1,5 +1,0 @@
-UPLOAD Debug: form_keys=['name', 'status', 'user_id'] files=['file'] name='page-upload-test' status='private' desc=None form_user='54787502-fa92-44f0-b46d-cde1a08768e9' file_filename=mytest.txt
-UPLOAD Debug: cwd=C:\Users\hp\Desktop\frontend form_keys=['name', 'status', 'user_id'] files=['file'] name='page-upload-test' status='private' desc=None form_user='54787502-fa92-44f0-b46d-cde1a08768e9' file_filename=mytest.txt
-UPLOAD Debug: cwd=C:\Users\hp\Desktop\frontend form_keys=['name', 'status', 'user_id'] files=['file'] name='page-upload' status='private' desc=None form_user='54787502-fa92-44f0-b46d-cde1a08768e9' file_filename=temp_test_upload.txt
-UPLOAD Debug: cwd=C:\Users\hp\Desktop\frontend form_keys=['user_id', 'name', 'description', 'status'] files=['file'] name='eee' status='public' desc='eee' form_user='54787502-fa92-44f0-b46d-cde1a08768e9' file_filename=Projet_Cloud.pdf
-UPLOAD Debug: cwd=C:\Users\hp\Desktop\frontend form_keys=['user_id', 'name', 'description', 'status'] files=['file'] name='cours de cloud' status='public' desc='exemple' form_user='54787502-fa92-44f0-b46d-cde1a08768e9' file_filename=Fondamentaux du cloud-1.pdf

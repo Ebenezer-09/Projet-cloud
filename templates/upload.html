@@ -1,103 +1,69 @@
 {% extends 'base.html' %}
-{% block title %}FileShare - Téléversement{% endblock %}
+{% block title %}FileShare - Upload{% endblock %}
 {% block content %}
-<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
-    <div class="layout-container flex h-full grow flex-col">
-        <!-- Header Component -->
-        <header class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-6 py-4 lg:px-40">
-            <div class="flex items-center gap-3">
-                <div class="text-primary flex items-center justify-center">
-                    <span class="material-symbols-outlined text-3xl">cloud_upload</span>
-                </div>
-                <h2 class="text-slate-900 dark:text-slate-100 text-xl font-bold leading-tight tracking-tight">Cloudinary</h2>
+<div class="md:flex md:min-h-screen">
+  {% include 'components/_sidebar.html' %}
+
+  <main class="flex-1 min-w-0 px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+    <section class="max-w-3xl mx-auto animate-fadeUp">
+      <div class="mb-6">
+        <p class="text-xs uppercase tracking-[0.16em] text-soft">Upload</p>
+        <h1 class="mt-2 text-3xl font-display">Ajouter un fichier</h1>
+        <p class="mt-2 text-soft">Formulaire simple et propre pour televerser vos documents.</p>
+      </div>
+
+      <div class="panel rounded-3xl overflow-hidden shadow-soft">
+        <form id="upload-form" method="POST" enctype="multipart/form-data" class="p-6 sm:p-8 space-y-6">
+          <div>
+            <label class="text-sm font-semibold text-ink">Nom du fichier</label>
+            <input name="name" type="text" required placeholder="Ex: Rapport trimestriel" class="mt-2 w-full rounded-xl border border-line bg-white px-4 py-3 text-sm focus:border-accentDeep focus:ring-accentDeep"/>
+          </div>
+
+          <div>
+            <label class="text-sm font-semibold text-ink">Description</label>
+            <textarea name="description" rows="4" placeholder="Description optionnelle" class="mt-2 w-full rounded-xl border border-line bg-white px-4 py-3 text-sm focus:border-accentDeep focus:ring-accentDeep"></textarea>
+          </div>
+
+          <div>
+            <label class="text-sm font-semibold text-ink">Fichier</label>
+            <div class="mt-2 rounded-2xl border-2 border-dashed border-line bg-mist/55 px-5 py-8 text-center">
+              <span class="material-symbols-outlined text-3xl text-soft">upload_file</span>
+              <p class="mt-2 text-sm font-semibold text-ink">Choisissez un fichier (max 10 Mo)</p>
+              <p class="text-xs text-soft mt-1">PDF, DOC, XLS, ZIP, image, etc.</p>
+              <input id="file-input" name="file" type="file" required class="mt-4 block w-full rounded-lg border border-line bg-white px-3 py-2 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-accent file:px-3 file:py-1.5 file:font-semibold file:text-ink"/>
             </div>
-            <a href="{{ url_for('dashboard') }}" class="flex items-center justify-center rounded-lg h-10 w-10 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
-                <span class="material-symbols-outlined">close</span>
-            </a>
-        </header>
-        <!-- Main Content Area -->
-        <main class="flex-1 flex justify-center py-10 px-4">
-            <div class="w-full max-w-[640px] flex flex-col gap-8">
-                <!-- Title Section -->
-                <div class="flex flex-col gap-2">
-                    <h1 class="text-slate-900 dark:text-slate-100 text-3xl font-extrabold tracking-tight">Téléverser un fichier</h1>
-                    <p class="text-slate-500 dark:text-slate-400">Partagez vos documents ou gardez-les privés.</p>
+          </div>
+
+          <div>
+            <label class="text-sm font-semibold text-ink">Confidentialite</label>
+            <div class="mt-2 grid sm:grid-cols-2 gap-3">
+              <label class="panel rounded-xl px-4 py-3 flex items-center gap-3 cursor-pointer">
+                <input name="status" type="radio" value="private" checked class="text-accentDeep focus:ring-accentDeep"/>
+                <div>
+                  <p class="text-sm font-semibold text-ink">Prive</p>
+                  <p class="text-xs text-soft">Visible uniquement par vous</p>
                 </div>
-                <!-- Form Card -->
-                <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-                    <form id="upload-form" class="p-6 lg:p-8 flex flex-col gap-6" method="POST" enctype="multipart/form-data">
-                        <!-- hidden user id for diagnostics -->
-                        <input type="hidden" name="user_id" value="{{ user.id if user else '' }}" />
-                        <!-- File Name -->
-                        <div class="flex flex-col gap-2">
-                            <label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Nom du fichier</label>
-                            <input name="name" class="form-input block w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-primary focus:border-primary px-4 py-3 placeholder:text-slate-400" placeholder="ex : Vacances été 2024" type="text" required/>
-                        </div>
-                        <!-- Description -->
-                        <div class="flex flex-col gap-2">
-                            <label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Description</label>
-                            <textarea name="description" class="form-input block w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-primary focus:border-primary px-4 py-3 min-h-[120px] placeholder:text-slate-400" placeholder="Brève description (optionnel)"></textarea>
-                        </div>
-                        <!-- Upload Area -->
-                        <div class="flex flex-col gap-2">
-                            <label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Fichier</label>
-                            <div id="dropzone" class="relative group cursor-pointer flex flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 px-6 py-12 hover:border-primary dark:hover:border-primary hover:bg-primary/5 transition-all">
-                                <div class="size-14 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                                    <span class="material-symbols-outlined text-3xl">upload_file</span>
-                                </div>
-                                <div class="text-center">
-                                    <p class="text-slate-900 dark:text-slate-100 text-base font-bold">Cliquez pour téléverser ou glisser-déposer</p>
-                                    <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Tous types de fichiers (PDF, XLS, CSV, DOC, ZIP, etc.) – taille maximale 10 Mo</p>
-                                </div>
-                                <input id="file-input" name="file" class="absolute inset-0 opacity-0 cursor-pointer" type="file" required/>
-                            </div>
-                        </div>
-                        <!-- Status Selection -->
-                        <div class="flex flex-col gap-3">
-                            <label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Confidentialité</label>
-                            <div class="grid grid-cols-2 gap-4">
-                                <label class="relative flex items-center gap-3 p-4 rounded-lg border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-                                    <input checked name="status" class="w-4 h-4 text-primary border-slate-300 focus:ring-primary" type="radio" value="public"/>
-                                    <div class="flex flex-col">
-                                        <span class="text-sm font-bold text-slate-900 dark:text-slate-100">Public</span>
-                                        <span class="text-xs text-slate-500 dark:text-slate-400">Visible to everyone</span>
-                                    </div>
-                                </label>
-                                <label class="relative flex items-center gap-3 p-4 rounded-lg border border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-                                    <input name="status" class="w-4 h-4 text-primary border-slate-300 focus:ring-primary" type="radio" value="private"/>
-                                    <div class="flex flex-col">
-                                        <span class="text-sm font-bold text-slate-900 dark:text-slate-100">Privé</span>
-                                        <span class="text-xs text-slate-500 dark:text-slate-400">Only you can see this</span>
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
-                        <!-- Footer Actions -->
-                        <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 flex items-center justify-end gap-3">
-                            <a href="{{ url_for('dashboard') }}" class="px-5 py-2.5 rounded-lg text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
-                                Annuler
-                            </a>
-                            <button id="submit-btn" class="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-primary text-white text-sm font-bold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20" type="submit">
-                                <span class="material-symbols-outlined text-lg">cloud_done</span>
-                                <span>Téléverser</span>
-                            </button>
-                        </div>
-                    </form>
+              </label>
+              <label class="panel rounded-xl px-4 py-3 flex items-center gap-3 cursor-pointer">
+                <input name="status" type="radio" value="public" class="text-accentDeep focus:ring-accentDeep"/>
+                <div>
+                  <p class="text-sm font-semibold text-ink">Public</p>
+                  <p class="text-xs text-soft">Visible par tous</p>
                 </div>
-                <!-- Progress Sidebar / Additional Info -->
-                <div class="flex items-center justify-center gap-6 text-slate-400 dark:text-slate-600">
-                    <div class="flex items-center gap-1.5">
-                        <span class="material-symbols-outlined text-base">verified_user</span>
-                        <span class="text-xs font-medium uppercase tracking-widest">Transfert sécurisé</span>
-                    </div>
-                    <div class="h-4 w-px bg-slate-300 dark:bg-slate-800"></div>
-                    <div class="flex items-center gap-1.5">
-                        <span class="material-symbols-outlined text-base">speed</span>
-                        <span class="text-xs font-medium uppercase tracking-widest">CDN mondial</span>
-                    </div>
-                </div>
+              </label>
             </div>
-        </main>
-    </div>
+          </div>
+
+          <div class="pt-2 flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-3">
+            <a href="{{ url_for('dashboard') }}" class="inline-flex items-center justify-center rounded-xl border border-line px-4 py-2.5 text-sm font-semibold text-soft hover:bg-mist transition-colors">Annuler</a>
+            <button id="submit-btn" type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl bg-accent px-5 py-2.5 text-sm font-bold text-ink hover:bg-accent/80 transition-colors">
+              <span class="material-symbols-outlined text-[18px]">cloud_upload</span>
+              Televerser
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
 </div>
 {% endblock %}

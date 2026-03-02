@@ -1,21 +1,24 @@
-<header class="sticky top-0 z-50 bg-white/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-16">
-            <div class="flex items-center gap-2">
-                <div class="bg-primary p-2 rounded-lg">
-                    <span class="material-icons text-white">cloud_upload</span>
-                </div>
-                <span class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">FileShare</span>
-            </div>
-            <div class="flex items-center gap-4">
-                {% if session.user %}
-                    <a href="{{ url_for('dashboard') }}" class="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-primary transition-colors">Tableau de bord</a>
-                    <a href="{{ url_for('logout') }}" class="px-5 py-2 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-lg shadow-sm transition-all">Déconnexion</a>
-                {% else %}
-                    <a href="{{ url_for('login') }}" class="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-primary transition-colors">Connexion</a>
-                    <a href="{{ url_for('signup') }}" class="px-5 py-2 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-lg shadow-sm transition-all">Inscription</a>
-                {% endif %}
-            </div>
-        </div>
-    </div>
+<header class="sticky top-0 z-40 border-b border-line/80 bg-white/80 backdrop-blur">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    <a href="{{ url_for('home') }}" class="flex items-center gap-3">
+      <span class="h-9 w-9 rounded-xl bg-accent/70 text-ink flex items-center justify-center">
+        <span class="material-symbols-outlined text-[20px]">cloud_upload</span>
+      </span>
+      <div>
+        <p class="font-display text-[22px] leading-none">FileShare</p>
+        <p class="text-[11px] uppercase tracking-[0.18em] text-soft">Cloud Workspace</p>
+      </div>
+    </a>
+
+    <nav class="flex items-center gap-2 sm:gap-3">
+      {% if session.user %}
+        <a href="{{ url_for('home') }}" class="hidden sm:inline-flex px-4 py-2 rounded-lg text-sm font-semibold text-soft hover:text-ink transition-colors">Public</a>
+        <a href="{{ url_for('dashboard') }}" class="inline-flex px-4 py-2 rounded-lg text-sm font-semibold text-ink hover:bg-mist transition-colors">Dashboard</a>
+        <a href="{{ url_for('logout') }}" class="inline-flex px-4 py-2 rounded-lg text-sm font-semibold bg-accent text-ink hover:bg-accent/80 transition-colors">Deconnexion</a>
+      {% else %}
+        <a href="{{ url_for('login') }}" class="inline-flex px-4 py-2 rounded-lg text-sm font-semibold text-ink hover:bg-mist transition-colors">Connexion</a>
+        <a href="{{ url_for('signup') }}" class="inline-flex px-4 py-2 rounded-lg text-sm font-semibold bg-accent text-ink hover:bg-accent/80 transition-colors">Inscription</a>
+      {% endif %}
+    </nav>
+  </div>
 </header>

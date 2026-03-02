@@ -1,115 +1,111 @@
 {% extends 'base.html' %}
-{% block title %}FileShare - Tableau de bord{% endblock %}
+{% block title %}FileShare - Dashboard{% endblock %}
 {% block content %}
-<div class="flex h-screen overflow-hidden">
-    <!-- Sidebar -->
-    {% include 'components/_sidebar.html' %}
-    <!-- Main Content -->
-    <main class="flex-1 flex flex-col overflow-hidden">
-        <!-- Header -->
-        <header class="h-16 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between px-8">
-            <div class="flex items-center flex-1 max-w-md">
-                <div class="relative w-full">
-                    <span class="material-icons-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
-                    <input id="dashboard-search" class="w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border-none rounded-lg focus:ring-2 focus:ring-primary text-sm" placeholder="Rechercher vos fichiers..." type="text"/>
-                </div>
-            </div>
-            <div class="flex items-center gap-4">
-                <a href="{{ url_for('upload') }}" class="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-all shadow-sm">
-                    <span class="material-symbols-outlined text-sm">upload</span>
-                    <span>Téléverser un fichier</span>
-                </a>
-                <div class="h-8 w-px bg-slate-200 dark:bg-slate-800 mx-2"></div>
-                <button class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
-                    <span class="material-symbols-outlined">notifications</span>
-                </button>
-                <div class="h-10 w-10 rounded-full bg-slate-200 dark:bg-slate-700 border-2 border-white dark:border-slate-800 flex items-center justify-center overflow-hidden">
-                    <img alt="Profile" class="w-full h-full object-cover" src="https://via.placeholder.com/40"/>
-                </div>
-            </div>
-        </header>
-        <!-- Content Area -->
-        <div class="flex-1 overflow-y-auto p-8">
-            <div class="flex items-end justify-between mb-8">
-                <div>
-                    <h2 class="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Mes fichiers</h2>
-                    <p class="text-slate-500 dark:text-slate-400 mt-1">Gérez et organisez votre bibliothèque de documents personnelle.</p>
-                </div>
-                <div class="flex bg-white dark:bg-slate-800 rounded-lg p-1 border border-slate-200 dark:border-slate-700 shadow-sm">
-                    <button class="p-1.5 bg-slate-100 dark:bg-slate-700 rounded text-primary">
-                        <span class="material-symbols-outlined block">list</span>
-                    </button>
-                    <button class="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
-                        <span class="material-symbols-outlined block">grid_view</span>
-                    </button>
-                </div>
-            </div>
-            <!-- Table Container -->
-            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">
-                            <th class="px-6 py-4">Titre</th>
-                            <th class="px-6 py-4">Date d'upload</th>
-                            <th class="px-6 py-4">Statut</th>
-                            <th class="px-6 py-4 text-right">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
-                        {% for f in private_files %}
-                        <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
-                            <td class="px-6 py-4">
-                                <div class="flex items-center gap-3">
-                                    <div class="size-10 rounded {{ icon_bg_color() }} flex items-center justify-center text-{{ icon_color() }}">
-                                        <span class="material-symbols-outlined">insert_drive_file</span>
-                                    </div>
-                                    <div>
-                                        <p class="text-sm font-semibold text-slate-900 dark:text-white">
-                                            {% if f.link or f.url %}
-                                            <a href="{{ f.link or f.url }}" target="_blank" rel="noopener" class="hover:underline">{{ f.name }}</a>
-                                            {% else %}
-                                            {{ f.name }}
-                                            {% endif %}
-                                        </p>
-                                        <p class="text-xs text-slate-500">{{ f.size or '' }}</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">{{ f.created_at }}</td>
-                            <td class="px-6 py-4">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300' if f.status.lower()=='public' else 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300' }}">
-                                    {{ f.status.capitalize() }}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 text-right">
-                                <div class="flex items-center justify-end gap-2">
-                                    <form action="{{ url_for('change_status', file_id=f.id) }}" method="post">
-                                        <input type="hidden" name="status" value="{{ 'public' if f.status.lower()=='private' else 'private' }}" />
-                                        <button class="p-2 text-slate-400 hover:text-primary transition-colors" title="Changer le statut">
-                                            <span class="material-symbols-outlined">swap_horiz</span>
-                                        </button>
-                                    </form>
-                                    <form action="{{ url_for('delete_file_route', file_id=f.id) }}" method="post">
-                                        <button class="p-2 text-slate-400 hover:text-red-500 transition-colors" title="Supprimer">
-                                            <span class="material-symbols-outlined">delete</span>
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                    {% else %}
-                        <tr><td colspan="4" class="px-6 py-4 text-center text-sm text-slate-500">Aucun fichier</td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            <!-- Pagination Footer -->
-            <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between">
-                <span id="files-info" class="text-xs text-slate-500">Showing 0 files</span>
-                <div class="flex gap-2">
-                    <button id="prev-page" class="px-3 py-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50">Précédent</button>
-                    <button id="next-page" class="px-3 py-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50">Suivant</button>
-                </div>
-            </div>
-    </main>
+<div class="md:flex md:min-h-screen">
+  {% include 'components/_sidebar.html' %}
+
+  <main class="flex-1 min-w-0">
+    <header class="sticky top-0 z-20 border-b border-line bg-white/85 backdrop-blur">
+      <div class="px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+        <div>
+          <p class="text-xs uppercase tracking-[0.16em] text-soft">Espace prive</p>
+          <h1 class="mt-1 text-2xl font-display">Mes fichiers</h1>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="relative w-full sm:w-72">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-soft text-[20px]">search</span>
+            <input id="dashboard-search" type="text" placeholder="Rechercher un fichier..." class="w-full rounded-xl border border-line bg-white pl-10 pr-4 py-2.5 text-sm focus:border-accentDeep focus:ring-accentDeep"/>
+          </div>
+          <a href="{{ url_for('upload') }}" class="inline-flex items-center gap-2 rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-ink hover:bg-accent/80 transition-colors whitespace-nowrap">
+            <span class="material-symbols-outlined text-[18px]">upload</span>
+            Ajouter
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <section class="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6 animate-fadeUp">
+        <div class="panel rounded-2xl p-4">
+          <p class="text-xs uppercase tracking-[0.12em] text-soft">Total</p>
+          <p class="mt-2 text-2xl font-bold">{{ private_files|length }}</p>
+        </div>
+        <div class="panel rounded-2xl p-4">
+          <p class="text-xs uppercase tracking-[0.12em] text-soft">Visibilite</p>
+          <p class="mt-2 text-2xl font-bold">Public / Prive</p>
+        </div>
+        <div class="panel rounded-2xl p-4">
+          <p class="text-xs uppercase tracking-[0.12em] text-soft">Action rapide</p>
+          <p class="mt-2 text-2xl font-bold">Ajouter un fichier</p>
+        </div>
+      </div>
+
+      <div class="panel rounded-2xl overflow-hidden shadow-soft animate-fadeUp">
+        <div class="overflow-x-auto">
+          <table class="w-full min-w-[740px] text-left">
+            <thead class="bg-mist/80 border-b border-line">
+              <tr class="text-xs uppercase tracking-[0.12em] text-soft">
+                <th class="px-5 py-4 font-semibold">Nom</th>
+                <th class="px-5 py-4 font-semibold">Date</th>
+                <th class="px-5 py-4 font-semibold">Statut</th>
+                <th class="px-5 py-4 font-semibold text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-line/80">
+              {% for f in private_files %}
+              {% set file_status = (f.status or 'private')|lower %}
+              <tr data-private-file data-name="{{ (f.name or '')|lower }}" class="hover:bg-mist/35 transition-colors">
+                <td class="px-5 py-4">
+                  <div class="flex items-center gap-3">
+                    <span class="h-9 w-9 rounded-lg bg-mist border border-line text-ink flex items-center justify-center">
+                      <span class="material-symbols-outlined text-[18px]">description</span>
+                    </span>
+                    <div>
+                      {% if f.link or f.url %}
+                      <a href="{{ f.link or f.url }}" target="_blank" rel="noopener" class="font-semibold text-ink hover:underline">{{ f.name }}</a>
+                      {% else %}
+                      <p class="font-semibold text-ink">{{ f.name }}</p>
+                      {% endif %}
+                      <p class="text-xs text-soft mt-0.5">{{ f.size or 'Taille inconnue' }}</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-5 py-4 text-sm text-soft">{{ f.created_at or '-' }}</td>
+                <td class="px-5 py-4">
+                  <span class="inline-flex rounded-full border border-line bg-mist px-3 py-1 text-xs font-semibold text-ink">
+                    {{ file_status|capitalize }}
+                  </span>
+                </td>
+                <td class="px-5 py-4">
+                  <div class="flex items-center justify-end gap-2">
+                    <form action="{{ url_for('change_status', file_id=f.id) }}" method="post">
+                      <input type="hidden" name="status" value="{{ 'public' if file_status=='private' else 'private' }}"/>
+                      <button type="submit" class="inline-flex items-center gap-1 rounded-lg border border-line bg-white px-3 py-1.5 text-xs font-semibold text-soft hover:text-ink hover:bg-mist transition-colors">
+                        <span class="material-symbols-outlined text-[16px]">sync_alt</span>
+                        Statut
+                      </button>
+                    </form>
+                    <form action="{{ url_for('delete_file_route', file_id=f.id) }}" method="post">
+                      <button type="submit" class="inline-flex items-center gap-1 rounded-lg border border-[#e8c5c5] bg-white px-3 py-1.5 text-xs font-semibold text-[#8d2d2d] hover:bg-[#fff3f3] transition-colors">
+                        <span class="material-symbols-outlined text-[16px]">delete</span>
+                        Supprimer
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              {% else %}
+              <tr>
+                <td colspan="4" class="px-5 py-10 text-center text-soft">Aucun fichier disponible.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="dashboard-empty" class="hidden panel rounded-2xl p-8 text-center text-soft mt-4">Aucun resultat pour cette recherche.</div>
+    </section>
+  </main>
 </div>
 {% endblock %}

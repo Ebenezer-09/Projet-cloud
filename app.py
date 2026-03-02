@@ -5,13 +5,23 @@ import os
 import api
 
 app = Flask(__name__)
-# augmenter le niveau de logging pour voir les infos de démarrage
 app.logger.setLevel('INFO')
-# clé secrète pour session (doit être défini en production via env)
-app.secret_key = os.getenv("FLASK_SECRET_KEY", "replace-with-a-secure-key")
 
-# base url configurée depuis l'environnement si nécessaire (utilisé côté JS si besoin)
-app.config['API_URL'] = os.getenv('CLOUD_API_URL', api.BASE_URL)
+IS_PRODUCTION = os.getenv("VERCEL") == "1" or os.getenv("FLASK_ENV") == "production"
+
+secret_key = os.getenv("FLASK_SECRET_KEY")
+if not secret_key and IS_PRODUCTION:
+    raise RuntimeError("FLASK_SECRET_KEY doit etre defini en production.")
+app.secret_key = secret_key or "dev-only-secret-key"
+
+app.config.update(
+    API_URL=os.getenv('CLOUD_API_URL', api.BASE_URL),
+    MAX_CONTENT_LENGTH=10 * 1024 * 1024,  # 10 Mo
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE='Lax',
+)
+if IS_PRODUCTION:
+    app.config['SESSION_COOKIE_SECURE'] = True
 
 # log de configuration au démarrage
 app.logger.info(f"Using API_URL={app.config['API_URL']}")
@@ -42,6 +52,11 @@ def set_api_token():
     token = session.get('token')
     # nothing to set globally; token passed explicitly on each call
     return token
+
+@app.errorhandler(413)
+def payload_too_large(_):
+    flash('Fichier trop volumineux (max 10 Mo).', 'error')
+    return redirect(url_for('upload'))
 
 # ----- pages ---------------------------------------------------------------
 @app.route("/")
@@ -151,29 +166,13 @@ def upload():
     user = session.get('user', {})
     user_id = user.get('id')
     if request.method == 'POST':
-        # log contents of request for debugging integration
-        app.logger.info(f"upload POST form keys={list(request.form.keys())} files={list(request.files.keys())}")
+        app.logger.info("upload POST received")
         file_obj = request.files.get('file')
-        name = request.form.get('name')
+        name = request.form.get('name', '').strip()
         description = request.form.get('description')  # optionnel
-        status = request.form.get('status', 'private')
-        form_user_id = request.form.get('user_id')
-        import os
-        cwd = os.getcwd()
-        log_line = (f"UPLOAD Debug: cwd={cwd} form_keys={list(request.form.keys())} "
-                    f"files={list(request.files.keys())} name={name!r} "
-                    f"status={status!r} desc={description!r} form_user={form_user_id!r} "
-                    f"file_filename={file_obj.filename if file_obj else None}\n")
-        # show cwd in flash (temporary for debugging purposes)
-        flash(f"[DEBUG cwd]={cwd}", 'error')
-        # write to persistent log file as well
-        with open('upload_debug.log', 'a', encoding='utf-8') as flog:
-            flog.write(log_line)
-        app.logger.info(log_line)
-
-        # sanity check: form and session ids should match
-        if form_user_id and user_id and form_user_id != user_id:
-            app.logger.warning(f"form user_id {form_user_id} != session user_id {user_id}")
+        status = request.form.get('status', 'private').lower()
+        if status not in {'public', 'private'}:
+            status = 'private'
 
         # validation simple
         if not file_obj or file_obj.filename == "":
@@ -183,7 +182,7 @@ def upload():
             flash('Identifiant utilisateur introuvable, reconnectez-vous.', 'error')
             return redirect(url_for('login'))
 
-        if not name or not name.strip():
+        if not name:
             base = file_obj.filename.rsplit('.', 1)[0]
             name = base
 
@@ -207,5 +206,4 @@ def upload():
 
 
 if __name__ == "__main__":
-    # debug mode with reloader off prevents multiple restarts/exits when modules reload
-    app.run(debug=True, use_reloader=False)
+    app.run(debug=os.getenv("FLASK_DEBUG") == "1", use_reloader=False)
